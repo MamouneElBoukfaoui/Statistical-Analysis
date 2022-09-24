@@ -122,4 +122,4 @@ abline(a=0,b=1)
  
  # After Bonferroni correction:
 which(d>  qchisq(1-0.05/46,3))
-# none of the observations are identified as outliers
+# One observation is identified as an outlier
