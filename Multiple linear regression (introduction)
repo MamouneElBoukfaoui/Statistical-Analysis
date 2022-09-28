@@ -86,7 +86,7 @@ betahat
 # Here we are interested in creating a linear regression model of the response
 # variable ozone with respect to other input variables.
 # It is first interesting to have histograms of this response variable
-# and some of its transformations. (Histograms attached separately)
+# and some of its transformations.
 
  par(mfrow=c(2,3))
  hist(airquality$Ozone)
