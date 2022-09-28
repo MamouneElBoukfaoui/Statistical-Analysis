@@ -13,7 +13,7 @@ engine
 # dimension of our data set.
   dim(engine)
   #  [1] 46  3
-# dimension of our data set 
+# names of variables in  our data set 
   names(engine)
  #[1] "CO"  "HC"  "NOX"
  
@@ -44,7 +44,7 @@ summary(fit)
 
 # Here there is strong statistical evidence that 
 # for the model Y = b_0 + b_1*CO + b_2*HC + epsilon
-# the estimated coefficient b_0_hat = 2.44e-07 and b1= 0.000407 are close 
+# the estimated coefficient b_0_hat = 2.44e-07 and b1_hat= 0.000407 are close 
 # to the true unobserved coefficient b_0 and b_1.
 
 # This coefficients can be extracted form the model  
