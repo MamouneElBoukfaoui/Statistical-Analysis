@@ -1,0 +1,161 @@
+
+################################################################################
+# 3.1: Multiple linear regression example
+################################################################################
+
+################################################################################
+# a)
+
+# Load the data.
+engine <- read.table ('C:/Users/bglc56/Downloads/engine.dat', header = TRUE)
+engine
+
+# dimension of our data set.
+  dim(engine)
+  #  [1] 46  3
+# dimension of our data set 
+  names(engine)
+ #[1] "CO"  "HC"  "NOX"
+ 
+# Create our design matrix
+  X <- as.matrix(cbind(rep(1,46), engine[,1:2]) )
+# Extract our vector of response values of dimension 46 x 1.
+  Y <-  engine[,3]
+  
+# Create a multiple linear regression model called fit
+fit<-lm(NOX~CO+HC, data=engine)
+fit
+
+# Call:
+#lm(formula = NOX ~ CO + HC, data = engine)
+
+# Coefficients:
+#  (Intercept)           CO           HC  
+#      1.54354     -0.08877      0.89128  
+
+summary(fit)
+# Coefficients:
+#Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)  1.54354    0.25219   6.120 2.44e-07 ***
+# CO          -0.08877    0.02315  -3.834 0.000407 ***
+# HC           0.89128    0.72390   1.231 0.224936    
+---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# Here there is strong statistical evidence that 
+# for the model Y = b_0 + b_1*CO + b_2*HC + epsilon
+# the estimated coefficient b_0_hat = 2.44e-07 and b1= 0.000407 are close 
+# to the true unobserved coefficient b_0 and b_1.
+
+# This coefficients can be extracted form the model  
+beta_hat <- fit$coefficients
+beta_hat
+
+# One can compute this mathematically, the least squares unbiased estimator
+# of the true unobserved vector beta is (X^T X)^-1 X^T Y :
+betahat<- solve(t(X)%*%X)  %*% t(X) %*% Y
+betahat
+
+# One notices that betahat is equal to beta_hat. 
+
+######################################################
+## 3.2 Air quality data 
+#####################################################
+
+
+# a)
+ data(airquality)
+# Ozone Solar.R Wind Temp Month Day
+#1      41     190  7.4   67     5   1
+#2      36     118  8.0   72     5   2
+#3      12     149 12.6   74     5   3
+#4      18     313 11.5   62     5   4
+#5      NA      NA 14.3   56     5   5
+#6      28      NA 14.9   66     5   6
+#7      23     299  8.6   65     5   7
+#8      19      99 13.8   59     5   8
+#9       8      19 20.1   61     5   9
+#10     NA     194  8.6   69     5  10
+#...
+#...
+#...
+ 
+
+   # In this data set we observed a lot of missing values (NA) 
+
+# Here we are interested in creating a linear regression model of the response
+# variable ozone with respect to other input variables.
+# It is first interesting to have histograms of this response variable
+# and some of its transformations. (Histograms attached separately)
+
+ par(mfrow=c(2,3))
+ hist(airquality$Ozone)
+ hist(log(airquality$Ozone))
+ hist((airquality$Ozone)^2)
+ hist((airquality$Ozone)^3)
+ hist((airquality$Ozone)^{1/2})
+ hist((airquality$Ozone)^{1/3})
+    # Most of the distributions are rather skew
+    # That one with power 1/3 looks best (most normal) 
+
+# Now we create a new data frame omitting missing values.
+
+ names(airquality)
+ newair <- na.omit(airquality)
+ 
+# Add a new column called 'oz' to the data frame containing the response
+# variable to the power 1/3. 
+ 
+ newair$oz <- (newair$Ozone)^{1/3}
+ 
+# Produce a pairplot to have some idea of the interaction between the variables
+ pairs(newair)
+
+
+#
+ 
+# fit a linear model of oz versus the three predictors Solar.R, Wind, and Temp,
+# and save it into an object air.lm.
+ 
+ air.lm <- lm(oz~  Solar.R + Wind + Temp, data= newair)
+ air.lm
+ 
+ # Coefficients:
+ # (Intercept)      Solar.R         Wind         Temp  
+ #  -0.298945     0.002206    -0.075967     0.050058  
+
+# e) Now that we want to carry out some residual diagnostic of our linear model
+ 
+ plot(air.lm$res)  # there is no pattern and the variance appears constant -- so the data confirms 
+ # the assumption of linearity (A1) and homoskedacity/independance (A2) essential to perform accurate predictions 
+ # using linear regression. 
+
+ qqnorm(air.lm$res) # follows a straight line, so confirms Normality assumption (A3)
+# If you want to add the QQ line:
+qqline(air.lm$res)
+
+
+ ## This will be discussed in greater depth in  other scripts.  
+ 
+
+# f) We write a function sdev which, using the vector of residuals res and the number of model parameters
+# p as arguments, produces the value of the estimated error standard deviation, s.
+
+
+sdev <- function(res,p){
+  RSS <- sum(res^2)
+  s <-  sqrt(RSS/(length(res)-p))
+  return(s)
+}
+ 
+# Apply this
+# function on the fitted model air.lm
+
+sdev(air.lm$res, 4)
+summary(air.lm)$sigma
+
+#> sdev(air.lm$res, 4)
+# [1] 0.5102898
+#> 
+#> summary(air.lm)$sigma
+ # [1] 0.5102898
