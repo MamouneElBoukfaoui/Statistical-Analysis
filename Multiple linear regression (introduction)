@@ -1,7 +1,7 @@
 
-################################################################################
-# 3.1: Multiple linear regression example
-################################################################################
+################################################################################################################################
+# 3.1: Multiple linear regression example ( Graphics and supporting documents are available in graphics and documents)
+################################################################################################################################
 
 ################################################################################
 # a)
@@ -125,8 +125,8 @@ betahat
  #  -0.298945     0.002206    -0.075967     0.050058  
 
 # e) Now that we want to carry out some residual diagnostic of our linear model
- 
- plot(air.lm$res)  # there is no pattern and the variance appears constant -- so the data confirms 
+ par(mfrow = c(1,2))
+ plot(air.lm$res, main = 'residuals plot')  # there is no pattern and the variance appears constant -- so the data confirms 
  # the assumption of linearity (A1) and homoskedacity/independance (A2) essential to perform accurate predictions 
  # using linear regression. 
 
