@@ -1,0 +1,81 @@
+
+# estimated linear model 
+fit<-lm(NOX~CO+HC, data=engine)
+fit
+
+ beta<- fit$coef # estimated linear coefficient 
+ s<-summary(fit)$sigma # estimated standard error of this linear model
+ Sigma<- s^2*summary(fit)$cov.unscaled # the estimated variance matrix of beta
+
+ #            (Intercept)            CO          HC
+ # (Intercept)  0.063601963  0.0040631790 -0.16893795
+ # CO           0.004063179  0.0005361271 -0.01509929
+ # HC          -0.168937953 -0.0150992864  0.52403670
+
+ # SE(hatbeta1):standard error of beta hat 1 
+ sqrt(0.0005361271)
+ # [1] 0.02315442
+
+ # SE(hatbeta2):standard error of beta hat 2
+ sqrt(0.52403670)
+ # [1] 0.7239038
+
+
+# Here we produce 95 % confidence intervals of Beta 2 and Beta 3.
+ 
+ beta[2] +c(-1,1)*0.02315442 *qt(0.975, 43)
+ # -0.13546191 -0.04207123 confidence interval for beta 2
+ beta[3] +c(-1,1)*0.7239038 *qt(0.975, 43)
+ # -0.568613  2.351169 confidence interval for beta 3
+
+# These intervals can be computed directly
+confint(fit,2)
+ # [1] -0.13546190 -0.04207124
+confint(fit,3)
+ # [1] -0.568613  2.351169
+
+# Now, we carry out a statistical test of H0 : β2 = 0 vs. H1 : β2 ̸= 0 by
+ summary(fit)
+ # via p-value:   p=0.000407<0.05, so reject H0 at the 5% level
+ # via test statistic
+    t = abs(-0.08877/0.02315)
+    # 3.834557
+    qt(0.975, 43)
+    # 2.016692 < 3.834557, so reject H0
+ # via CI: [-0.13546191, -0.04207123]  does not contain 0 so we reject H0
+
+# Now, we carry out a statistical test of H0 : β3 = 1 vs. H1 : β3 ̸= 1
+ # via test statistic
+   t = abs((1-0.89128)/ 0.72390)
+   # 0.1501865 < 2.016692 so do not reject H0
+ # via CI: [-0.568613,  2.351169]  does contain 1 so do not reject H0. 
+
+
+## f) prediction
+ # From a light-duty engine, one measures 12.2 g carbon monoxide and 0.4g hydrocarbons emitted per mile of usage. Use your fitted model to predict the nitrogen oxide emitted per mile (g). Obtain a 95% confidence interval for the expected emission, as well as a 95% prediction interval for the actual emission. 
+
+predict(fit, newdata=data.frame("CO"=12.2, "HC"=0.4))
+ #        1 
+ # 0.8171029 
+
+predict(fit, newdata=data.frame("CO"=12.2, "HC"=0.4), interval="confidence")
+ #       fit       lwr      upr
+ #1 0.8171029 0.3947171 1.239489
+
+predict(fit, newdata=data.frame("CO"=12.2, "HC"=0.4), interval="prediction")
+ # fit         lwr      upr
+ #1 0.8171029 -0.01373135 1.647937
+
+# alternatively:
+x0<-c(1, 12.2,0.4)
+y0hat<-as.numeric(x0%*%fit$coef)
+y0hat
+ #[1,] 0.8171029
+
+#CI
+y0hat+c(-1,1)*qt(0.975, 43)*s*sqrt(as.numeric(x0%*%summary(fit)$cov.unscaled%*%x0))
+ #[1] 0.3947171 1.2394888
+
+#Predictiton interval PI
+y0hat+c(-1,1)*qt(0.975, 43)*s*sqrt(as.numeric(1+x0%*%summary(fit)$cov.unscaled%*%x0))
+ # [1] -0.01373135  1.64793720
